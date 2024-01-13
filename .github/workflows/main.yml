@@ -9,7 +9,7 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@latest
+      uses: actions/checkout@v4
 
     - name: Set up permissions for the script
       run: chmod +x ./kaggle/daily.sh
