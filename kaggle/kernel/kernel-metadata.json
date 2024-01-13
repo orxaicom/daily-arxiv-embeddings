@@ -1,7 +1,7 @@
 {
   "id": "orxaicom/daily-arxiv-embeddings-code",
   "title": "daily-arxiv-embeddings-code",
-  "code_file": "./kaggle.ipynb",
+  "code_file": "./daily-arxiv-embeddings-code.ipynb",
   "language": "python",
   "kernel_type": "notebook",
   "is_private": "true",
