@@ -12,9 +12,7 @@ jobs:
       uses: actions/checkout@v4
     
     - name: Set Kaggle Secrets
-      run: |
-        export KAGGLE_USERNAME= ${{ secrets.KAGGLE_USERNAME }}
-        export KAGGLE_KEY= ${{ secrets.KAGGLE_KEY }}
+      run: export KAGGLE_USERNAME= ${{ secrets.KAGGLE_USERNAME }} && export KAGGLE_KEY= ${{ secrets.KAGGLE_KEY }}
 
     - name: Set up permissions for the script
       run: chmod +x ./kaggle/daily.sh
