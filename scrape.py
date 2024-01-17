@@ -79,56 +79,64 @@ def scrape_arxiv_data(subjects):
             links = soup.select(".list-identifier a:nth-child(1)")
             ids = [link["href"].split("/")[-1] for link in links[:id_number]]
 
-            params = {"id_list": ",".join(ids), "start": 0, "max_results": 2000}
-            api_url = "http://export.arxiv.org/api/query"
+            # Define the maximum number of IDs per request
+            max_ids_per_request = 400
+            for i in range(0, len(ids), max_ids_per_request):
+                chunk_ids = ids[i : i + max_ids_per_request]
+                params = {
+                    "id_list": ",".join(chunk_ids),
+                    "start": 0,
+                    "max_results": 2000,
+                }
+                api_url = "http://export.arxiv.org/api/query"
 
-            response = requests.get(api_url, params=params)
-            if response.status_code != 200:
-                raise ConnectionError(
-                    f"Failed to fetch data from the arXiv API for subject {subject}."
-                )
+                response = requests.get(api_url, params=params)
+                if response.status_code != 200:
+                    raise ConnectionError(
+                        f"Failed to fetch data from the arXiv API for subject {subject}."
+                    )
 
-            root = ET.fromstring(response.content)
+                root = ET.fromstring(response.content)
 
-            namespaces = {
-                "atom": "http://www.w3.org/2005/Atom",
-                "arxiv": "http://arxiv.org/schemas/atom",
-            }
+                namespaces = {
+                    "atom": "http://www.w3.org/2005/Atom",
+                    "arxiv": "http://arxiv.org/schemas/atom",
+                }
 
-            field = get_field(subject)
+                field = get_field(subject)
 
-            # Iterate over entries and write to CSV
-            for entry in root.findall("atom:entry", namespaces):
-                arxiv = deversioner(
-                    entry.find("atom:id", namespaces).text.strip().split("/")[-1]
-                )
-                title = entry.find("atom:title", namespaces).text.strip()
-                categories_list = [
-                    category.attrib["term"]
-                    for category in entry.findall("atom:category", namespaces)
-                ]
-                authors_list = [
-                    author.find("atom:name", namespaces).text.strip()
-                    for author in entry.findall("atom:author", namespaces)
-                ]
-                abstract = entry.find("atom:summary", namespaces).text.strip()
+                # Iterate over entries and write to CSV
+                for entry in root.findall("atom:entry", namespaces):
+                    arxiv = deversioner(
+                        entry.find("atom:id", namespaces).text.strip().split("/")[-1]
+                    )
+                    title = entry.find("atom:title", namespaces).text.strip()
+                    categories_list = [
+                        category.attrib["term"]
+                        for category in entry.findall("atom:category", namespaces)
+                    ]
+                    authors_list = [
+                        author.find("atom:name", namespaces).text.strip()
+                        for author in entry.findall("atom:author", namespaces)
+                    ]
+                    abstract = entry.find("atom:summary", namespaces).text.strip()
 
-                # Directly write all data to the CSV file
-                csv_writer.writerow(
-                    {
-                        "arxiv": arxiv,
-                        "field": field,
-                        "subject": subject,
-                        "categories": ",".join(categories_list),
-                        "authors": ",".join(authors_list),
-                        "title": title,
-                        "abstract": abstract,
-                    }
-                )
+                    # Directly write all data to the CSV file
+                    csv_writer.writerow(
+                        {
+                            "arxiv": arxiv,
+                            "field": field,
+                            "subject": subject,
+                            "categories": ",".join(categories_list),
+                            "authors": ",".join(authors_list),
+                            "title": title,
+                            "abstract": abstract,
+                        }
+                    )
 
-            print(f"Data for subject {subject} successfully added to the CSV file.")
-            # Be gentle with arXiv
-            time.sleep(3)
+                print(f"Data for subject {subject} successfully added to the CSV file.")
+                # Be gentle with arXiv
+                time.sleep(3)
 
     print("Combined data for all subjects successfully saved to CSV file.")
 
