@@ -1,6 +1,6 @@
 # Daily arXiv Embeddings
 
-The embedding are calculated using the latest AllenAI's
+The embeddings are calculated using the latest AllenAI's
 [specter2_aug2023refresh_base](https://huggingface.co/allenai/specter2_aug2023refresh_base).
 
 It is pre-trained on most recent scientific papers.
