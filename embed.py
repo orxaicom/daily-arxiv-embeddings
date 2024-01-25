@@ -3,9 +3,12 @@ from adapters import AutoAdapterModel
 import pandas as pd
 from tqdm import tqdm
 import os
-
+import torch
 
 os.environ["TOKENIZERS_PARALLELISM"] = "true"
+
+# Check if CUDA is available and set the device accordingly
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Load model and tokenizer
 tokenizer = AutoTokenizer.from_pretrained("allenai/specter2_aug2023refresh_base")
@@ -17,9 +20,8 @@ model.load_adapter(
     set_active=True,
 )
 
-# Move model to GPU
-device = "cuda" if torch.cuda.is_available() else "cpu"
-model = model.to(device)
+# Move the model to the device
+model.to(device)
 
 # Read data from CSV
 df = pd.read_csv("daily-arxiv-embeddings.csv")
@@ -36,7 +38,7 @@ for index, row in tqdm(df.iterrows(), total=len(df), desc="Processing items"):
     # Concatenate title and abstract
     text = title + tokenizer.sep_token + abstract
 
-    # Preprocess the input and move to GPU
+    # Preprocess the input and move to the device
     inputs = tokenizer(
         text,
         padding=True,
@@ -50,8 +52,11 @@ for index, row in tqdm(df.iterrows(), total=len(df), desc="Processing items"):
     output = model(**inputs)
     embedding = output.last_hidden_state[:, 0, :]
 
+    # Move the embedding back to CPU for numpy conversion and detach from the computation graph
+    embedding = embedding.detach().cpu().numpy().tobytes()
+
     # Save the embedding in the DataFrame
-    df.at[index, "embedding"] = embedding.detach().cpu().numpy().tobytes()
+    df.at[index, "embedding"] = embedding
 
 # Save the DataFrame with embeddings to the same CSV file
 df.to_csv("daily-arxiv-embeddings.csv", index=False)
