@@ -17,6 +17,10 @@ model.load_adapter(
     set_active=True,
 )
 
+# Move model to GPU
+device = "cuda" if torch.cuda.is_available() else "cpu"
+model = model.to(device)
+
 # Read data from CSV
 df = pd.read_csv("daily-arxiv-embeddings.csv")
 
@@ -32,7 +36,7 @@ for index, row in tqdm(df.iterrows(), total=len(df), desc="Processing items"):
     # Concatenate title and abstract
     text = title + tokenizer.sep_token + abstract
 
-    # Preprocess the input
+    # Preprocess the input and move to GPU
     inputs = tokenizer(
         text,
         padding=True,
@@ -40,14 +44,14 @@ for index, row in tqdm(df.iterrows(), total=len(df), desc="Processing items"):
         return_tensors="pt",
         return_token_type_ids=False,
         max_length=512,
-    )
+    ).to(device)
 
     # Get the embeddings
     output = model(**inputs)
     embedding = output.last_hidden_state[:, 0, :]
 
     # Save the embedding in the DataFrame
-    df.at[index, "embedding"] = embedding.detach().numpy().tobytes()
+    df.at[index, "embedding"] = embedding.detach().cpu().numpy().tobytes()
 
 # Save the DataFrame with embeddings to the same CSV file
 df.to_csv("daily-arxiv-embeddings.csv", index=False)
