@@ -8,3 +8,5 @@ It is pre-trained on most recent scientific papers.
 You can download the CSV from our
 [Kaggle Dataset](https://www.kaggle.com/datasets/orxaicom/daily-arxiv-embeddings).
 It gets updated every day.
+
+We use this to visualize daily arXiv papers. Take a look at it [here](https://www.orxai.com).
