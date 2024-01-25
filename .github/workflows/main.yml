@@ -22,15 +22,3 @@ jobs:
 
     - name: Execute the bash script
       run: ./kaggle/daily.sh
-
-    - name: Trigger External Workflow
-      uses: actions/github-script@v7
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        script: |
-          const response = await octokit.request('POST /repos/:owner/:repo/dispatches', {
-            owner: 'orxaicom',
-            repo: 'arxiv-radar',
-            event_type: 'trigger-external-event',
-          });
-          console.log(response.data);
