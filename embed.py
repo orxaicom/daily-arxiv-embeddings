@@ -7,7 +7,6 @@ import torch
 
 os.environ["TOKENIZERS_PARALLELISM"] = "true"
 
-# Check if CUDA is available and set the device accordingly
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Load model and tokenizer
@@ -20,13 +19,20 @@ model.load_adapter(
     set_active=True,
 )
 
-# Move the model to the device
 model.to(device)
 
-# Read data from CSV
-df = pd.read_csv("daily-arxiv-embeddings.csv")
+column_types = {
+    "arxiv": str,
+    "field": str,
+    "subject": str,
+    "categories": str,
+    "authors": str,
+    "title": str,
+    "abstract": str,
+}
 
-# Set 'embedding' column to None initially
+df = pd.read_csv("daily-arxiv-embeddings.csv", dtype=column_types)
+
 df["embedding"] = None
 
 # Process each row from the CSV with tqdm for progress tracking
