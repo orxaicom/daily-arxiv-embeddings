@@ -10,3 +10,5 @@ You can download the CSV from our
 It gets updated every day.
 
 We use this to visualize daily arXiv papers. Take a look at it [here](https://www.orxai.com).
+
+[TODO] Make this run again if failed
