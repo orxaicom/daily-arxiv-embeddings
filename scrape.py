@@ -72,12 +72,16 @@ def scrape_arxiv_data(subjects):
             response.raise_for_status()
 
             soup = BeautifulSoup(response.text, "lxml")
-            link_id = soup.select_one("#dlpage li:nth-child(2) a")["href"]
-            id_match = re.search(r"#item(\d+)", link_id)
-            id_number = int(id_match.group(1)) - 1 if id_match else 0
+            link_element = soup.select_one("#dlpage li:nth-child(2) a")
+            link_id = link_element["href"] if link_element else None
+            id_match = re.search(r"#item(\d+)", link_id) if link_id else None
+            id_number = int(id_match.group(1)) - 1 if id_match else None
 
             links = soup.select(".list-identifier a:nth-child(1)")
-            ids = [link["href"].split("/")[-1] for link in links[:id_number]]
+            if id_number is not None:
+                ids = [link["href"].split("/")[-1] for link in links[:id_number]]
+            else:
+                ids = [link["href"].split("/")[-1] for link in links]
 
             # Define the maximum number of IDs per request
             max_ids_per_request = 400
