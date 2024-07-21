@@ -77,11 +77,11 @@ def scrape_arxiv_data(subjects):
             id_match = re.search(r"#item(\d+)", link_id) if link_id else None
             id_number = int(id_match.group(1)) - 1 if id_match else None
 
-            links = soup.select(".list-identifier a:nth-child(1)")
+            links = soup.select("dt a:nth-child(2)")
             if id_number is not None:
-                ids = [link["href"].split("/")[-1] for link in links[:id_number]]
+                ids = [link["id"] for link in links[:id_number]]
             else:
-                ids = [link["href"].split("/")[-1] for link in links]
+                ids = [link["id"] for link in links]
 
             # Define the maximum number of IDs per request
             max_ids_per_request = 400
