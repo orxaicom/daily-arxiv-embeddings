@@ -2,7 +2,7 @@ name: Calculate The Embeddings
 
 on:
   schedule:
-    - cron: '35 1 * * 1-5' # Run at 01:35 AM (UTC) from Monday to Friday
+    - cron: '05 1 * * 1-5' # Run at 01:05 AM (UTC) from Monday to Friday
   workflow_dispatch:
 
 jobs:
